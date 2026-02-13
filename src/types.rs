@@ -34,7 +34,7 @@ pub enum ChipType {
 /// Normalized value output
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct NormalizeOutput {
-    pub bytes: String,  // base64 encoded
+    pub bytes: String, // base64 encoded
     pub cid: Cid,
 }
 
@@ -55,7 +55,7 @@ pub struct PolicyEvalOutput {
 /// Compilation output
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CompileOutput {
-    pub rb_bytes: String,  // base64 encoded
+    pub rb_bytes: String, // base64 encoded
     pub rb_cid: Cid,
 }
 

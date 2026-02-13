@@ -1,14 +1,14 @@
-pub mod normalize;
-pub mod validate;
-pub mod policy;
 pub mod compile;
 pub mod exec;
+pub mod normalize;
+pub mod policy;
+pub mod validate;
 
-pub use normalize::normalize;
-pub use validate::validate;
-pub use policy::policy_eval;
 pub use compile::compile;
 pub use exec::exec;
+pub use normalize::normalize;
+pub use policy::policy_eval;
+pub use validate::validate;
 
 /// Base transistor opcodes
 pub const OPCODE_NORMALIZE: u8 = 2;

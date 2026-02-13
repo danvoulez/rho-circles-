@@ -1,0 +1,41 @@
+{
+  "chip": "mod.log",
+  "version": "1.0.0",
+  "type": "module",
+  "inputs": {
+    "level": { "enum": ["info", "warn", "error"] },
+    "message": { "type": "string" },
+    "fields": { "type": "object", "optional": true }
+  },
+  "outputs": {
+    "rc": { "type": "object" }
+  },
+  "wiring": [
+    {
+      "op": "rho.normalize",
+      "inputs": ["params"],
+      "output": "norm"
+    },
+    {
+      "op": "rho.validate",
+      "inputs": ["norm.cid", "schema:rc.log.v1"],
+      "output": "valid"
+    },
+    {
+      "op": "rho.rc.emit",
+      "inputs": ["norm.value"],
+      "output": "rc"
+    }
+  ],
+  "description": "Structured logging module that normalizes, validates, and emits log records",
+  "example": {
+    "input": {
+      "level": "info",
+      "message": "System started",
+      "fields": {
+        "version": "1.0.0",
+        "environment": "production"
+      }
+    }
+  }
+}

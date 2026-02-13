@@ -1,9 +1,9 @@
-pub mod chips;
 pub mod cas;
-pub mod rc;
+pub mod chips;
+pub mod errors;
 pub mod modules;
 pub mod products;
+pub mod rc;
 pub mod types;
-pub mod errors;
 
-pub use errors::{RhoError, Result};
+pub use errors::{Result, RhoError};

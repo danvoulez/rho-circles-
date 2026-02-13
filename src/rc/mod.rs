@@ -1,8 +1,8 @@
-use crate::{Result, RhoError};
+use crate::Result;
 use serde_json::Value;
 
 /// RC (Recibo) emission
-/// 
+///
 /// Builds and emits a Recibo Card
 pub fn emit(body: Value) -> Result<Value> {
     // TODO: Implement RC emission with signature and SIRP

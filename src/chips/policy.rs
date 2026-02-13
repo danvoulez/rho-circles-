@@ -1,19 +1,17 @@
-use crate::{Result, RhoError};
 use crate::types::{PolicyEvalOutput, Proof};
+use crate::Result;
 
 /// Evaluate a signature policy expression against provided proofs
-/// 
+///
 /// Policy Grammar:
-/// policy = hybrid-and "(" list ")" 
+/// policy = hybrid-and "(" list ")"
 ///        | hybrid-or  "(" list ")"
 ///        | ed25519 | mldsa3 | "true" | "false"
 /// list = policy ("," policy)*
-pub fn policy_eval(policy_expr: String, proofs: Vec<Proof>) -> Result<PolicyEvalOutput> {
+pub fn policy_eval(_policy_expr: String, _proofs: Vec<Proof>) -> Result<PolicyEvalOutput> {
     // TODO: Implement policy parser and evaluator
     // For now, return a placeholder
-    Ok(PolicyEvalOutput {
-        result: true,
-    })
+    Ok(PolicyEvalOutput { result: true })
 }
 
 #[cfg(test)]

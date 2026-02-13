@@ -1,0 +1,46 @@
+{
+  "chip": "rho.normalize",
+  "version": "1.0.0",
+  "type": "base",
+  "inputs": {
+    "value": { "type": "any" }
+  },
+  "outputs": {
+    "bytes": { "type": "string", "encoding": "base64" },
+    "cid": { "type": "string" }
+  },
+  "determinism": "spec→rb",
+  "opcode": 2,
+  "description": "Transform any input into a single, platform‑independent canonical byte representation",
+  "algorithm": [
+    "Parse input as JSON (if string, parse; otherwise treat as already parsed)",
+    "Normalize Unicode – apply NFC (Normalization Form Canonical Composition) to all strings",
+    "Normalize numbers – reject any non‑integer numeric value. Accept only i64 range",
+    "Normalize null/absent – drop object keys with value null",
+    "Sort object keys recursively (lexicographic, byte order)",
+    "Serialize to canonical JSON (no whitespace)",
+    "Output base64 of the canonical bytes and its blake3 CID"
+  ],
+  "test_vectors": [
+    {
+      "input": {"b": 2, "a": 1},
+      "expected_canonical": "{\"a\":1,\"b\":2}",
+      "description": "Keys should be sorted alphabetically"
+    },
+    {
+      "input": {"x": "café"},
+      "expected_canonical": "{\"x\":\"café\"}",
+      "description": "Unicode strings normalized to NFC"
+    },
+    {
+      "input": 123,
+      "expected_canonical": "123",
+      "description": "Integer numbers preserved"
+    },
+    {
+      "input": {"a": 1, "b": null, "c": 3},
+      "expected_canonical": "{\"a\":1,\"c\":3}",
+      "description": "Null values removed from objects"
+    }
+  ]
+}

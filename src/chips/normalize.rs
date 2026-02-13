@@ -1,11 +1,11 @@
+use crate::types::{NormalizeOutput};
 use crate::{Result, RhoError};
-use crate::types::{Cid, NormalizeOutput};
+use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use serde_json::Value;
 use unicode_normalization::UnicodeNormalization;
-use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 
 /// Normalize a JSON value to canonical form
-/// 
+///
 /// Algorithm:
 /// 1. Parse input as JSON (if string, parse; otherwise treat as already parsed).
 /// 2. Normalize Unicode – apply NFC (Normalization Form Canonical Composition) to all strings.
@@ -17,18 +17,18 @@ use base64::{Engine as _, engine::general_purpose::STANDARD as BASE64};
 pub fn normalize(value: Value) -> Result<NormalizeOutput> {
     // Normalize the value recursively
     let normalized = normalize_value(value)?;
-    
+
     // Serialize to canonical JSON (no whitespace)
     let canonical_json = serde_json::to_string(&normalized)?;
     let canonical_bytes = canonical_json.as_bytes();
-    
+
     // Compute blake3 hash
     let hash = blake3::hash(canonical_bytes);
     let cid = BASE64.encode(hash.as_bytes());
-    
+
     // Encode bytes as base64
     let bytes_b64 = BASE64.encode(canonical_bytes);
-    
+
     Ok(NormalizeOutput {
         bytes: bytes_b64,
         cid,
@@ -49,14 +49,14 @@ fn normalize_value(value: Value) -> Result<Value> {
                 Ok(Value::Number(serde_json::Number::from(i)))
             } else {
                 Err(RhoError::Normalize(
-                    "only i64 integers allowed, no floats or exponential notation".to_string()
+                    "only i64 integers allowed, no floats or exponential notation".to_string(),
                 ))
             }
         }
         Value::Object(map) => {
             // Remove null values and normalize recursively
             let mut normalized_map = serde_json::Map::new();
-            
+
             for (k, v) in map {
                 if !v.is_null() {
                     let normalized_key = k.nfc().collect::<String>();
@@ -64,23 +64,21 @@ fn normalize_value(value: Value) -> Result<Value> {
                     normalized_map.insert(normalized_key, normalized_value);
                 }
             }
-            
+
             // Sort keys (serde_json::Map maintains insertion order, but we need sorted)
             let mut sorted: Vec<(String, Value)> = normalized_map.into_iter().collect();
             sorted.sort_by(|a, b| a.0.cmp(&b.0));
-            
+
             let mut result_map = serde_json::Map::new();
             for (k, v) in sorted {
                 result_map.insert(k, v);
             }
-            
+
             Ok(Value::Object(result_map))
         }
         Value::Array(arr) => {
             // Normalize each element
-            let normalized: Result<Vec<Value>> = arr.into_iter()
-                .map(normalize_value)
-                .collect();
+            let normalized: Result<Vec<Value>> = arr.into_iter().map(normalize_value).collect();
             Ok(Value::Array(normalized?))
         }
         Value::Null => Ok(Value::Null),
@@ -97,7 +95,7 @@ mod tests {
     fn test_normalize_simple_object() {
         let input = json!({"b": 2, "a": 1});
         let result = normalize(input).unwrap();
-        
+
         // Check that the canonical form has sorted keys
         let decoded = BASE64.decode(&result.bytes).unwrap();
         let decoded_str = String::from_utf8(decoded).unwrap();
@@ -109,7 +107,7 @@ mod tests {
         // "café" can be represented in different ways
         let input = json!({"x": "café"});
         let result = normalize(input).unwrap();
-        
+
         // Should be NFC normalized
         let decoded = BASE64.decode(&result.bytes).unwrap();
         let decoded_str = String::from_utf8(decoded).unwrap();
@@ -128,7 +126,7 @@ mod tests {
     fn test_normalize_integer() {
         let input = json!(123);
         let result = normalize(input).unwrap();
-        
+
         let decoded = BASE64.decode(&result.bytes).unwrap();
         let decoded_str = String::from_utf8(decoded).unwrap();
         assert_eq!(decoded_str, "123");
@@ -138,7 +136,7 @@ mod tests {
     fn test_normalize_removes_null() {
         let input = json!({"a": 1, "b": null, "c": 3});
         let result = normalize(input).unwrap();
-        
+
         let decoded = BASE64.decode(&result.bytes).unwrap();
         let decoded_str = String::from_utf8(decoded).unwrap();
         assert_eq!(decoded_str, r#"{"a":1,"c":3}"#);
@@ -149,7 +147,7 @@ mod tests {
     fn test_normalize_array_with_null() {
         let input = json!([null, 1, 2]);
         let result = normalize(input).unwrap();
-        
+
         let decoded = BASE64.decode(&result.bytes).unwrap();
         let decoded_str = String::from_utf8(decoded).unwrap();
         assert_eq!(decoded_str, "[null,1,2]");
@@ -162,11 +160,14 @@ mod tests {
             "a": {"x": 3}
         });
         let result = normalize(input).unwrap();
-        
+
         let decoded = BASE64.decode(&result.bytes).unwrap();
         let decoded_str = String::from_utf8(decoded).unwrap();
         // Both outer and inner keys should be sorted
-        assert_eq!(decoded_str, r#"{"a":{"x":3},"z":{"nested_a":1,"nested_b":2}}"#);
+        assert_eq!(
+            decoded_str,
+            r#"{"a":{"x":3},"z":{"nested_a":1,"nested_b":2}}"#
+        );
     }
 
     #[test]
@@ -174,10 +175,10 @@ mod tests {
         // Same input should produce same CID
         let input1 = json!({"b": 2, "a": 1});
         let input2 = json!({"a": 1, "b": 2});
-        
+
         let result1 = normalize(input1).unwrap();
         let result2 = normalize(input2).unwrap();
-        
+
         assert_eq!(result1.cid, result2.cid);
         assert_eq!(result1.bytes, result2.bytes);
     }

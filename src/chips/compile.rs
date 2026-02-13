@@ -1,8 +1,8 @@
-use crate::{Result, RhoError};
-use crate::types::{ChipSpec, CompileOutput, Cid};
+use crate::types::{ChipSpec, CompileOutput};
+use crate::Result;
 
 /// Compile a chip_spec DAG into deterministic TLV bytecode
-/// 
+///
 /// TLV Bytecode Format:
 /// - Version: 1 byte (0x01)
 /// - Opcode: 1 byte (ISA opcode 2-255)
@@ -11,17 +11,23 @@ use crate::types::{ChipSpec, CompileOutput, Cid};
 /// - OutputCount: 1 byte
 /// - OutputType: 1 byte
 /// - Children: variable (nested RB for composite chips)
-pub fn compile(chip_spec: ChipSpec, dependencies: Option<serde_json::Value>) -> Result<CompileOutput> {
+pub fn compile(
+    _chip_spec: ChipSpec,
+    _dependencies: Option<serde_json::Value>,
+) -> Result<CompileOutput> {
     // TODO: Implement TLV bytecode compiler
     // For now, return a placeholder
     let placeholder_bytecode = vec![0x01, 0x02]; // Version 1, opcode 2
-    let rb_bytes = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, &placeholder_bytecode);
-    let rb_cid = base64::Engine::encode(&base64::engine::general_purpose::STANDARD, blake3::hash(&placeholder_bytecode).as_bytes());
-    
-    Ok(CompileOutput {
-        rb_bytes,
-        rb_cid,
-    })
+    let rb_bytes = base64::Engine::encode(
+        &base64::engine::general_purpose::STANDARD,
+        &placeholder_bytecode,
+    );
+    let rb_cid = base64::Engine::encode(
+        &base64::engine::general_purpose::STANDARD,
+        blake3::hash(&placeholder_bytecode).as_bytes(),
+    );
+
+    Ok(CompileOutput { rb_bytes, rb_cid })
 }
 
 #[cfg(test)]
@@ -42,7 +48,7 @@ mod tests {
             opcode: Some(2),
             wiring: None,
         };
-        
+
         let result = compile(spec, None).unwrap();
         assert!(!result.rb_bytes.is_empty());
         assert!(!result.rb_cid.is_empty());
