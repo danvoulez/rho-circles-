@@ -1,4 +1,3 @@
-use crate::cas::Cas;
 use crate::chips::normalize;
 use crate::types::{ChipSpec, ChipType, CompileOutput};
 use crate::{Result, RhoError};
