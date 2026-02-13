@@ -1,0 +1,206 @@
+{
+  "registry_version": "1.0.0",
+  "base_transistors": {
+    "rho.normalize": {
+      "chip": "rho.normalize",
+      "version": "1.0.0",
+      "type": "base",
+      "opcode": 2,
+      "inputs": {
+        "value": { "type": "any" }
+      },
+      "outputs": {
+        "bytes": { "type": "string", "encoding": "base64" },
+        "cid": { "type": "string" }
+      },
+      "determinism": "spec→rb",
+      "status": "implemented"
+    },
+    "rho.validate": {
+      "chip": "rho.validate",
+      "version": "1.0.0",
+      "type": "base",
+      "opcode": 3,
+      "inputs": {
+        "value": { "type": "any" },
+        "schema_cid": { "type": "string" }
+      },
+      "outputs": {
+        "valid": { "type": "boolean" },
+        "errors": { "type": "array", "optional": true }
+      },
+      "determinism": "spec→rb",
+      "status": "implemented"
+    },
+    "rho.policy.eval": {
+      "chip": "rho.policy.eval",
+      "version": "1.0.0",
+      "type": "base",
+      "opcode": 4,
+      "inputs": {
+        "policy_expr": { "type": "string" },
+        "proofs": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "algorithm": { "enum": ["ed25519", "mldsa3"] },
+              "public_key": { "type": "string" },
+              "signature": { "type": "string" },
+              "message_cid": { "type": "string" }
+            }
+          }
+        }
+      },
+      "outputs": {
+        "result": { "type": "boolean" }
+      },
+      "determinism": "spec→rb",
+      "status": "implemented"
+    },
+    "rho.compile": {
+      "chip": "rho.compile",
+      "version": "1.0.0",
+      "type": "base",
+      "opcode": 5,
+      "inputs": {
+        "chip_spec": { "type": "object" },
+        "dependencies": { "type": "object", "optional": true }
+      },
+      "outputs": {
+        "rb_bytes": { "type": "string", "encoding": "base64" },
+        "rb_cid": { "type": "string" }
+      },
+      "determinism": "spec→rb",
+      "status": "implemented"
+    },
+    "rho.exec": {
+      "chip": "rho.exec",
+      "version": "1.0.0",
+      "type": "base",
+      "opcode": 6,
+      "inputs": {
+        "rb_cid": { "type": "string" },
+        "inputs": { "type": "object" }
+      },
+      "outputs": {
+        "body": { "type": "object" },
+        "content_cid": { "type": "string" }
+      },
+      "determinism": "rb→rc",
+      "status": "implemented"
+    }
+  },
+  "modules": {
+    "mod.log": {
+      "chip": "mod.log",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": {
+        "level": { "enum": ["info","warn","error"] },
+        "message": { "type": "string" },
+        "fields": { "type": "object", "optional": true }
+      },
+      "outputs": {
+        "rc": { "type": "object" }
+      },
+      "status": "not_implemented"
+    },
+    "mod.chip.publish": {
+      "chip": "mod.chip.publish",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": {
+        "chip_spec": { "type": "object" },
+        "owner_cid": { "type": "string" }
+      },
+      "outputs": { 
+        "rc": { "type": "object" } 
+      },
+      "status": "not_implemented"
+    },
+    "mod.chip.build": {
+      "chip": "mod.chip.build",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": {
+        "spec_cid": { "type": "string" }
+      },
+      "outputs": { 
+        "rc": { "type": "object" } 
+      },
+      "status": "not_implemented"
+    },
+    "mod.chip.eval": {
+      "chip": "mod.chip.eval",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": {
+        "rb_cid": { "type": "string" },
+        "chip_inputs": { "type": "object" }
+      },
+      "outputs": { 
+        "rc": { "type": "object" } 
+      },
+      "status": "not_implemented"
+    },
+    "mod.ledger.append": {
+      "chip": "mod.ledger.append",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": { 
+        "rc": { "type": "object" } 
+      },
+      "outputs": { 
+        "success": { "type": "boolean" } 
+      },
+      "status": "not_implemented"
+    },
+    "mod.permit": {
+      "chip": "mod.permit",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": {
+        "principal": { "type": "string" },
+        "action": { "type": "string" },
+        "resource": { "type": "string" },
+        "policy_cid": { "type": "string" }
+      },
+      "outputs": { 
+        "allowed": { "type": "boolean" } 
+      },
+      "status": "not_implemented"
+    },
+    "mod.judge": {
+      "chip": "mod.judge",
+      "version": "1.0.0",
+      "type": "module",
+      "inputs": {
+        "prompt_cid": { "type": "string" },
+        "policy_cid": { "type": "string" }
+      },
+      "outputs": { 
+        "rc": { "type": "object" } 
+      },
+      "status": "not_implemented"
+    }
+  },
+  "products": {
+    "product.logline-trust": {
+      "chip": "product.logline-trust",
+      "version": "1.0.0",
+      "type": "product",
+      "manifest": {
+        "modules": {
+          "permit": "cid:mod.permit.v1",
+          "judge": "cid:mod.judge.v1",
+          "ghost": "cid:mod.ghost.v1",
+          "ledger": "cid:mod.ledger.append.v1",
+          "log": "cid:mod.log.v1"
+        },
+        "interface": "http-proxy"
+      },
+      "status": "not_implemented"
+    }
+  }
+}
