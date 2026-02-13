@@ -1,4 +1,4 @@
-use crate::types::{NormalizeOutput};
+use crate::types::NormalizeOutput;
 use crate::{Result, RhoError};
 use base64::{engine::general_purpose::STANDARD as BASE64, Engine as _};
 use serde_json::Value;
