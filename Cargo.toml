@@ -11,6 +11,8 @@ base64 = "0.22"
 unicode-normalization = "0.1"
 thiserror = "1.0"
 anyhow = "1.0"
+jsonschema = "0.18"
+regex = "1.10"
 
 [dev-dependencies]
 proptest = "1.4"
