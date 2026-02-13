@@ -246,10 +246,10 @@ Compile-time checks prevent:
 To close the inner ring first:
 
 1. ✅ rho.normalize (COMPLETE)
-2. ⏳ rho.validate (stub)
-3. ⏳ rho.policy.eval (stub)
-4. ⏳ rho.compile (stub)
-5. ⏳ rho.exec (stub)
+2. ✅ rho.validate (COMPLETE)
+3. ✅ rho.policy.eval (COMPLETE)
+4. ✅ rho.compile (COMPLETE)
+5. ✅ rho.exec (COMPLETE)
 6. Then modules
 7. Then products
 

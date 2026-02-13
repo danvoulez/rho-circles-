@@ -55,10 +55,10 @@ cargo run
 - [x] Project structure
 - [x] rho.normalize implementation
 - [x] CAS (Content Addressable Storage)
-- [ ] rho.validate
-- [ ] rho.policy.eval
-- [ ] rho.compile
-- [ ] rho.exec
+- [x] rho.validate
+- [x] rho.policy.eval
+- [x] rho.compile
+- [x] rho.exec
 - [ ] Modules
 - [ ] Products
 - [ ] CI/CD pipeline

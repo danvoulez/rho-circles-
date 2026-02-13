@@ -30,7 +30,7 @@
         "errors": { "type": "array", "optional": true }
       },
       "determinism": "spec→rb",
-      "status": "stub"
+      "status": "implemented"
     },
     "rho.policy.eval": {
       "chip": "rho.policy.eval",
@@ -56,7 +56,7 @@
         "result": { "type": "boolean" }
       },
       "determinism": "spec→rb",
-      "status": "stub"
+      "status": "implemented"
     },
     "rho.compile": {
       "chip": "rho.compile",
@@ -72,7 +72,7 @@
         "rb_cid": { "type": "string" }
       },
       "determinism": "spec→rb",
-      "status": "stub"
+      "status": "implemented"
     },
     "rho.exec": {
       "chip": "rho.exec",
@@ -88,7 +88,7 @@
         "content_cid": { "type": "string" }
       },
       "determinism": "rb→rc",
-      "status": "stub"
+      "status": "implemented"
     }
   },
   "modules": {
