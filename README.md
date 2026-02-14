@@ -160,6 +160,23 @@ let passport = register_with_hash(
 )?;
 ```
 
+## UI Template System
+
+**New!** A complete, modular UI template system is now available in `ui/`:
+
+- **Design Philosophy:** Glass & Ledger - translucent panels over immutable data
+- **Tech Stack:** React 18 + TypeScript + Vite + Tailwind CSS + Framer Motion
+- **Components:** 7 reusable atomic components (CidBadge, StatusIndicator, JsonViewer, etc.)
+- **Zero Custody:** Client-side hashing and verification
+- **Production Ready:** Can be applied to any Rho product
+
+See `ui/README.md` and `PRODUCT_UI_EXAMPLES.md` for complete documentation.
+
+**Quick Start:**
+```bash
+cd ui && npm install && npm run dev
+```
+
 ## Status
 
 - [x] Project structure
@@ -171,6 +188,7 @@ let passport = register_with_hash(
 - [x] rho.exec
 - [x] Modules (mod.log, mod.chip.*, mod.ledger, mod.permit, mod.judge)
 - [x] Products (api-notary, content-sign, ai-passport)
+- [x] **UI Template System** (Glass & Ledger design)
 - [x] CI/CD pipeline
 
 ## Determinism Laws
