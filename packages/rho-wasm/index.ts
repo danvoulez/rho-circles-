@@ -21,12 +21,13 @@ let initPromise: Promise<void> | null = null;
  * Must be called before using any other functions
  */
 export async function initialize(): Promise<void> {
-  if (isInitialized) return;
-  
+  // Check for existing initialization first to avoid race conditions
   if (initPromise) {
     await initPromise;
     return;
   }
+  
+  if (isInitialized) return;
 
   initPromise = (async () => {
     try {

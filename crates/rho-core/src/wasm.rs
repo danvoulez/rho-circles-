@@ -18,7 +18,7 @@ pub struct ValidateOutput {
 /// Initialize the WASM module (can be called for any setup if needed)
 #[wasm_bindgen]
 pub fn init() {
-    // Set panic hook for better error messages in future
+    // Set panic hook for better error messages in the future
     // Currently no additional setup needed
 }
 
