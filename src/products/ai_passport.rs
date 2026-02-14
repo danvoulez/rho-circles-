@@ -68,6 +68,7 @@ pub struct PassportReceipt {
 ///
 /// Creates an immutable record proving the model's compliance status,
 /// bias metrics, and training data characteristics.
+#[allow(clippy::too_many_arguments)]
 pub fn register_model(
     model_info: ModelInfo,
     model_weights: Vec<u8>,

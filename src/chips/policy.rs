@@ -78,7 +78,7 @@ fn parse_list(list: &str) -> Result<Vec<PolicyNode>> {
     let mut depth = 0;
     let mut start = 0;
 
-    for (i, ch) in list.chars().enumerate() {
+    for (i, ch) in list.char_indices() {
         match ch {
             '(' => depth += 1,
             ')' => depth -= 1,
