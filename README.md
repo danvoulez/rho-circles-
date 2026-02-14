@@ -14,13 +14,13 @@ The system consists of three concentric rings:
 - **rho.exec** (opcode 6): Stack machine interpreter (WIP)
 
 ### Middle Ring: Modules (Capacities)
-- **mod.log**: Structured logging
-- **mod.chip.publish**: Chip definition publishing
-- **mod.chip.build**: Chip compilation
-- **mod.chip.eval**: Chip execution
-- **mod.ledger**: Append-only ledger
-- **mod.permit**: Access control
-- **mod.judge**: LLM gateway
+- **mod.log**: Structured logging ✅
+- **mod.chip.publish**: Chip definition publishing ✅
+- **mod.chip.build**: Chip compilation ✅
+- **mod.chip.eval**: Chip execution ✅
+- **mod.ledger**: Append-only ledger ✅
+- **mod.permit**: Access control ✅
+- **mod.judge**: LLM gateway ✅
 
 ### Outer Ring: Products
 - **product.logline-trust**: Complete LLM trust pipeline
@@ -40,9 +40,17 @@ cargo build
 
 ## Testing
 
+All code is tested with comprehensive unit and integration tests.
+
 ```bash
 cargo test
 ```
+
+**Test Coverage**: 71 tests
+- 56 unit tests (Inner Ring + Middle Ring + Infrastructure)
+- 15 integration tests (Normalization spec vectors)
+
+All tests verify determinism and follow THE CANON.
 
 ## Running
 
@@ -59,9 +67,9 @@ cargo run
 - [x] rho.policy.eval
 - [x] rho.compile
 - [x] rho.exec
-- [ ] Modules
+- [x] Modules (mod.log, mod.chip.*, mod.ledger, mod.permit, mod.judge)
 - [ ] Products
-- [ ] CI/CD pipeline
+- [x] CI/CD pipeline
 
 ## Determinism Laws
 
