@@ -23,7 +23,9 @@ The system consists of three concentric rings:
 - **mod.judge**: LLM gateway ✅
 
 ### Outer Ring: Products
-- **product.logline-trust**: Complete LLM trust pipeline
+- **product.api-notary**: HTTP wrapper for B2B API receipt generation ✅
+- **product.content-sign**: CLI tool for content signing and verification ✅
+- **product.ai-passport**: AI model registry with compliance certification ✅
 
 ## Core Principles
 
@@ -46,8 +48,8 @@ All code is tested with comprehensive unit and integration tests.
 cargo test
 ```
 
-**Test Coverage**: 71 tests
-- 56 unit tests (Inner Ring + Middle Ring + Infrastructure)
+**Test Coverage**: 85 tests
+- 70 unit tests (Inner Ring + Middle Ring + Products + Infrastructure)
 - 15 integration tests (Normalization spec vectors)
 
 All tests verify determinism and follow THE CANON.
@@ -56,6 +58,106 @@ All tests verify determinism and follow THE CANON.
 
 ```bash
 cargo run
+```
+
+## Products
+
+The Outer Ring contains complete applications built on top of the Middle Ring modules:
+
+### product.api-notary
+
+**Purpose**: Sidecar for B2B APIs that generates cryptographic receipts for every data exchange.
+
+**Use Case**: Eliminates "I didn't receive that" disputes in API integrations by providing immutable proof of what was sent and received.
+
+**How it works**:
+1. Intercepts HTTP request/response pairs
+2. Normalizes the transaction data using `rho.normalize`
+3. Emits a signed Recibo Card (RC) that both parties can verify
+4. Supports hybrid signatures (Ed25519 + ML-DSA3)
+
+**Example**:
+```rust
+use rho_circles::products::{notarize, ApiTransaction};
+
+let transaction = ApiTransaction {
+    method: "POST".to_string(),
+    path: "/api/v1/payment".to_string(),
+    timestamp: "2024-01-01T12:00:00Z".to_string(),
+    request_body: Some(json!({"amount": 100})),
+    response_body: Some(json!({"status": "success"})),
+    status_code: 200,
+};
+
+let receipt = notarize(transaction, signatures)?;
+```
+
+### product.content-sign
+
+**Purpose**: CLI tool for content creators to sign files/JSONs and generate verifiable receipts.
+
+**Use Case**: Newsrooms, publishers, and content creators can prove authenticity of their content, creating a "blue checkmark" system to combat fake news.
+
+**How it works**:
+1. Takes any content (text, JSON, binary files)
+2. Computes blake3 CID of the content
+3. Creates a signed metadata record with author, timestamp, and content CID
+4. Emits a Recibo Card that anyone can verify offline
+
+**Example**:
+```rust
+use rho_circles::products::sign_json;
+
+let article = json!({
+    "headline": "Breaking News",
+    "content": "..."
+});
+
+let receipt = sign_json(
+    article,
+    "Verified News Agency".to_string(),
+    "2024-01-01T12:00:00Z".to_string(),
+    signatures,
+)?;
+```
+
+### product.ai-passport
+
+**Purpose**: Simple registry for AI models with compliance certification and bias metrics.
+
+**Use Case**: Satisfies EU AI Act requirements by providing immutable proof of model characteristics, training data, and compliance status.
+
+**How it works**:
+1. Developers upload model weights hash and compliance documentation
+2. System records bias metrics (demographic parity, fairness scores, toxicity)
+3. Generates a unified Recibo Card proving compliance
+4. Validates metrics against regulatory thresholds
+
+**Bias Metrics** (represented as integers 0-10000 for determinism):
+- `demographic_parity`: Should be ≤ 2000 (0.20 or 20%)
+- `equal_opportunity`: Should be ≥ 8000 (0.80 or 80%)
+- `fairness_score`: Should be ≥ 7000 (0.70 or 70%)
+- `toxicity_score`: Should be ≤ 3000 (0.30 or 30%)
+
+**Example**:
+```rust
+use rho_circles::products::ai_passport::{register_with_hash, BiasMetrics};
+
+let bias_metrics = BiasMetrics {
+    demographic_parity: 1200,  // 0.12
+    equal_opportunity: 8800,   // 0.88
+    fairness_score: 8500,      // 0.85
+    toxicity_score: Some(1000), // 0.10
+};
+
+let passport = register_with_hash(
+    model_info,
+    model_weights_cid,
+    compliance_doc,
+    bias_metrics,
+    timestamp,
+    signatures,
+)?;
 ```
 
 ## Status
@@ -68,7 +170,7 @@ cargo run
 - [x] rho.compile
 - [x] rho.exec
 - [x] Modules (mod.log, mod.chip.*, mod.ledger, mod.permit, mod.judge)
-- [ ] Products
+- [x] Products (api-notary, content-sign, ai-passport)
 - [x] CI/CD pipeline
 
 ## Determinism Laws
