@@ -1,12 +1,12 @@
 // Example: AI Passport Product
-// 
+//
 // Demonstrates how to use product.ai-passport to register AI models
 // with compliance certification and bias metrics.
 
 use rho_circles::cas::Cas;
 use rho_circles::products::ai_passport::{
-    register_model, register_with_hash, validate_compliance, verify_passport,
-    BiasMetrics, ComplianceDoc, ModelInfo,
+    register_model, register_with_hash, validate_compliance, verify_passport, BiasMetrics,
+    ComplianceDoc, ModelInfo,
 };
 use rho_circles::types::Signature;
 use serde_json::json;
@@ -24,16 +24,18 @@ fn main() {
         version: "2.1.0".to_string(),
         architecture: "transformer".to_string(),
         parameters: 350_000_000,
-        training_data_description: "Curated customer service conversations (2020-2023), filtered for PII and toxicity".to_string(),
+        training_data_description:
+            "Curated customer service conversations (2020-2023), filtered for PII and toxicity"
+                .to_string(),
     };
 
     // Bias metrics use integer scale 0-10000 (divide by 10000 for decimal)
     // Example: 1500 = 0.15 = 15%
     let bias_metrics = BiasMetrics {
-        demographic_parity: 800,     // 0.08 (8%) - Low bias across demographics
-        equal_opportunity: 9200,     // 0.92 (92%) - High equal opportunity
-        fairness_score: 8900,        // 0.89 (89%) - Strong fairness
-        toxicity_score: Some(500),   // 0.05 (5%) - Very low toxicity
+        demographic_parity: 800,   // 0.08 (8%) - Low bias across demographics
+        equal_opportunity: 9200,   // 0.92 (92%) - High equal opportunity
+        fairness_score: 8900,      // 0.89 (89%) - Strong fairness
+        toxicity_score: Some(500), // 0.05 (5%) - Very low toxicity
     };
 
     // Mock model weights and compliance PDF
@@ -67,23 +69,40 @@ fn main() {
         Ok(passport) => {
             println!("✓ AI Model registered successfully!");
             println!("\nPassport details:");
-            println!("  Model: {} v{}", passport.passport.model_info.model_name, passport.passport.model_info.version);
+            println!(
+                "  Model: {} v{}",
+                passport.passport.model_info.model_name, passport.passport.model_info.version
+            );
             println!("  Parameters: {}", passport.passport.model_info.parameters);
-            println!("  Architecture: {}", passport.passport.model_info.architecture);
+            println!(
+                "  Architecture: {}",
+                passport.passport.model_info.architecture
+            );
             println!("\nCompliance:");
             println!("  Framework: {}", passport.passport.compliance.framework);
             println!("  Risk Level: {}", passport.passport.compliance.risk_level);
             println!("  Auditor: {}", passport.passport.compliance.auditor);
             println!("\nBias Metrics:");
-            println!("  Demographic Parity: {} ({}%)", passport.passport.bias_metrics.demographic_parity, 
-                passport.passport.bias_metrics.demographic_parity as f64 / 100.0);
-            println!("  Equal Opportunity: {} ({}%)", passport.passport.bias_metrics.equal_opportunity,
-                passport.passport.bias_metrics.equal_opportunity as f64 / 100.0);
-            println!("  Fairness Score: {} ({}%)", passport.passport.bias_metrics.fairness_score,
-                passport.passport.bias_metrics.fairness_score as f64 / 100.0);
-            println!("  Toxicity Score: {} ({}%)", 
+            println!(
+                "  Demographic Parity: {} ({}%)",
+                passport.passport.bias_metrics.demographic_parity,
+                passport.passport.bias_metrics.demographic_parity as f64 / 100.0
+            );
+            println!(
+                "  Equal Opportunity: {} ({}%)",
+                passport.passport.bias_metrics.equal_opportunity,
+                passport.passport.bias_metrics.equal_opportunity as f64 / 100.0
+            );
+            println!(
+                "  Fairness Score: {} ({}%)",
+                passport.passport.bias_metrics.fairness_score,
+                passport.passport.bias_metrics.fairness_score as f64 / 100.0
+            );
+            println!(
+                "  Toxicity Score: {} ({}%)",
                 passport.passport.bias_metrics.toxicity_score.unwrap_or(0),
-                passport.passport.bias_metrics.toxicity_score.unwrap_or(0) as f64 / 100.0);
+                passport.passport.bias_metrics.toxicity_score.unwrap_or(0) as f64 / 100.0
+            );
 
             // Verify passport integrity
             match verify_passport(&passport) {
@@ -99,7 +118,10 @@ fn main() {
                 Err(e) => println!("✗ Validation error: {}", e),
             }
 
-            println!("\nPassport CID: {}", passport.receipt_card.recibo.content_cid);
+            println!(
+                "\nPassport CID: {}",
+                passport.receipt_card.recibo.content_cid
+            );
         }
         Err(e) => {
             println!("✗ Registration failed: {}", e);
@@ -114,7 +136,8 @@ fn main() {
         version: "1.5.2".to_string(),
         architecture: "cnn".to_string(),
         parameters: 75_000_000,
-        training_data_description: "Labeled content moderation dataset (public sources)".to_string(),
+        training_data_description: "Labeled content moderation dataset (public sources)"
+            .to_string(),
     };
 
     let compliance_2 = ComplianceDoc {
@@ -126,10 +149,10 @@ fn main() {
     };
 
     let bias_metrics_2 = BiasMetrics {
-        demographic_parity: 1800,    // 0.18 (18%)
-        equal_opportunity: 8500,     // 0.85 (85%)
-        fairness_score: 7500,        // 0.75 (75%)
-        toxicity_score: Some(2500),  // 0.25 (25%) - Higher for content moderation
+        demographic_parity: 1800,   // 0.18 (18%)
+        equal_opportunity: 8500,    // 0.85 (85%)
+        fairness_score: 7500,       // 0.75 (75%)
+        toxicity_score: Some(2500), // 0.25 (25%) - Higher for content moderation
     };
 
     match register_with_hash(
@@ -144,7 +167,7 @@ fn main() {
             println!("✓ Model registered with hash!");
             println!("  Model: {}", passport.passport.model_info.model_name);
             println!("  Risk Level: {}", passport.passport.compliance.risk_level);
-            
+
             match validate_compliance(&passport.passport) {
                 Ok(true) => println!("  ✓ Compliance: PASSED"),
                 Ok(false) => println!("  ✗ Compliance: FAILED (metrics out of threshold)"),

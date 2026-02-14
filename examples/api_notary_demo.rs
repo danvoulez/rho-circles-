@@ -1,5 +1,5 @@
 // Example: API Notary Product
-// 
+//
 // Demonstrates how to use product.api-notary to create cryptographic
 // receipts for B2B API transactions.
 
@@ -61,10 +61,19 @@ fn main() {
             println!("\n✓ Transaction notarized successfully!");
             println!("\nReceipt details:");
             println!("  Content CID: {}", receipt.receipt_card.recibo.content_cid);
-            println!("  Signatures: {}", receipt.receipt_card.recibo.signatures.len());
-            println!("  Order ID: {}", receipt.transaction.request_body.as_ref()
-                .and_then(|b| b.get("order_id"))
-                .unwrap_or(&json!("N/A")));
+            println!(
+                "  Signatures: {}",
+                receipt.receipt_card.recibo.signatures.len()
+            );
+            println!(
+                "  Order ID: {}",
+                receipt
+                    .transaction
+                    .request_body
+                    .as_ref()
+                    .and_then(|b| b.get("order_id"))
+                    .unwrap_or(&json!("N/A"))
+            );
 
             // Verify the receipt
             match verify_notary(&receipt) {

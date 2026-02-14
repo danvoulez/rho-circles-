@@ -52,7 +52,7 @@ mod tests {
         let body = json!({"test": "data"});
         let rc1 = rc::emit(body.clone()).unwrap();
         let rc2 = rc::emit(body).unwrap();
-        
+
         let result1 = append(rc1, &cas).unwrap();
         let result2 = append(rc2, &cas).unwrap();
         assert_eq!(result1, true);

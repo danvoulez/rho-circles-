@@ -40,6 +40,23 @@ The system consists of three concentric rings:
 cargo build
 ```
 
+### Building WASM
+
+To build the WebAssembly module for browser use:
+
+```bash
+# Install wasm32 target (one-time)
+rustup target add wasm32-unknown-unknown
+
+# Install wasm-bindgen-cli (one-time)
+cargo install wasm-bindgen-cli --version 0.2.108
+
+# Build WASM
+./build-wasm.sh
+```
+
+This compiles `crates/rho-core` to WebAssembly and generates JavaScript bindings in `packages/rho-wasm/`.
+
 ## Testing
 
 All code is tested with comprehensive unit and integration tests.
@@ -167,6 +184,7 @@ let passport = register_with_hash(
 - **Design Philosophy:** Glass & Ledger - translucent panels over immutable data
 - **Tech Stack:** React 18 + TypeScript + Vite + Tailwind CSS + Framer Motion
 - **Components:** 7 reusable atomic components (CidBadge, StatusIndicator, JsonViewer, etc.)
+- **WASM Integration:** Real cryptographic operations run in the browser via WebAssembly
 - **Zero Custody:** Client-side hashing and verification
 - **Production Ready:** Can be applied to any Rho product
 
@@ -174,8 +192,25 @@ See `ui/README.md` and `PRODUCT_UI_EXAMPLES.md` for complete documentation.
 
 **Quick Start:**
 ```bash
+# Build WASM first
+./build-wasm.sh
+
+# Start UI dev server
 cd ui && npm install && npm run dev
+
+# Build for production
+cd ui && npm run build
 ```
+
+The UI uses the real `rho-core` WASM module for:
+- JSON normalization (canonical form)
+- Blake3 CID generation (base64url, no padding)
+- Content validation
+
+**Performance:** 
+- WASM module: ~305 KB (~90 KB gzipped)
+- Normalization: <20ms for 10-30KB objects
+- All operations deterministic and reproducible
 
 ## Status
 

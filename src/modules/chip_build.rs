@@ -67,7 +67,8 @@ mod tests {
             wiring: None,
         };
 
-        let normalized = crate::chips::normalize(serde_json::to_value(&chip_spec).unwrap()).unwrap();
+        let normalized =
+            crate::chips::normalize(serde_json::to_value(&chip_spec).unwrap()).unwrap();
         let spec_bytes = base64::engine::general_purpose::STANDARD
             .decode(&normalized.bytes)
             .unwrap();
@@ -104,7 +105,8 @@ mod tests {
             wiring: None,
         };
 
-        let normalized = crate::chips::normalize(serde_json::to_value(&chip_spec).unwrap()).unwrap();
+        let normalized =
+            crate::chips::normalize(serde_json::to_value(&chip_spec).unwrap()).unwrap();
         let spec_bytes = base64::engine::general_purpose::STANDARD
             .decode(&normalized.bytes)
             .unwrap();

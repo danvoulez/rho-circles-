@@ -1,0 +1,22 @@
+{
+  "name": "@rho-circles/wasm",
+  "version": "0.1.0",
+  "description": "WASM bindings for Rho Circles core functionality",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "files": [
+    "index.ts",
+    "rho_core.js",
+    "rho_core.d.ts",
+    "rho_core_bg.wasm",
+    "rho_core_bg.wasm.d.ts"
+  ],
+  "exports": {
+    ".": {
+      "import": "./index.ts",
+      "types": "./index.ts"
+    },
+    "./rho_core_bg.wasm": "./rho_core_bg.wasm"
+  }
+}
