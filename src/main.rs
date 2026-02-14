@@ -92,7 +92,10 @@ fn main() {
     match products::notarize(transaction, vec![]) {
         Ok(receipt) => {
             println!("   ✓ API transaction notarized!");
-            println!("   Receipt CID: {}", receipt.receipt_card.recibo.content_cid);
+            println!(
+                "   Receipt CID: {}",
+                receipt.receipt_card.recibo.content_cid
+            );
             println!("   Method: {}", receipt.transaction.method);
             println!("   Path: {}", receipt.transaction.path);
         }
@@ -141,9 +144,9 @@ fn main() {
         document_cid: "compliance_doc_cid".to_string(),
     };
     let bias_metrics = products::ai_passport::BiasMetrics {
-        demographic_parity: 1200, // 0.12
-        equal_opportunity: 8800,  // 0.88
-        fairness_score: 8500,     // 0.85
+        demographic_parity: 1200,   // 0.12
+        equal_opportunity: 8800,    // 0.88
+        fairness_score: 8500,       // 0.85
         toxicity_score: Some(1000), // 0.10
     };
     match products::register_with_hash(
@@ -156,10 +159,13 @@ fn main() {
     ) {
         Ok(receipt) => {
             println!("   ✓ AI Model registered!");
-            println!("   Passport CID: {}", receipt.receipt_card.recibo.content_cid);
+            println!(
+                "   Passport CID: {}",
+                receipt.receipt_card.recibo.content_cid
+            );
             println!("   Model: {}", receipt.passport.model_info.model_name);
             println!("   Framework: {}", receipt.passport.compliance.framework);
-            
+
             // Validate compliance
             match products::validate_compliance(&receipt.passport) {
                 Ok(true) => println!("   ✓ Compliance validation: PASSED"),

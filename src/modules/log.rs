@@ -59,7 +59,8 @@ pub fn log(level: String, message: String, fields: Option<Value>, cas: &Cas) -> 
 
     // Store schema in CAS
     let schema_normalized = normalize(schema)?;
-    let schema_bytes = base64::engine::general_purpose::STANDARD.decode(&schema_normalized.bytes)?;
+    let schema_bytes =
+        base64::engine::general_purpose::STANDARD.decode(&schema_normalized.bytes)?;
     let schema_cid = cas.put(schema_bytes)?;
 
     // Validate the log entry
@@ -82,12 +83,7 @@ mod tests {
     #[test]
     fn test_log_info() {
         let cas = Cas::new();
-        let result = log(
-            "info".to_string(),
-            "Test message".to_string(),
-            None,
-            &cas,
-        );
+        let result = log("info".to_string(), "Test message".to_string(), None, &cas);
         assert!(result.is_ok());
         let rc = result.unwrap();
         assert_eq!(rc.body["level"], "info");
@@ -112,32 +108,15 @@ mod tests {
     #[test]
     fn test_log_invalid_level() {
         let cas = Cas::new();
-        let result = log(
-            "debug".to_string(),
-            "Test message".to_string(),
-            None,
-            &cas,
-        );
+        let result = log("debug".to_string(), "Test message".to_string(), None, &cas);
         assert!(result.is_err());
     }
 
     #[test]
     fn test_log_deterministic() {
         let cas = Cas::new();
-        let rc1 = log(
-            "info".to_string(),
-            "Test".to_string(),
-            None,
-            &cas,
-        )
-        .unwrap();
-        let rc2 = log(
-            "info".to_string(),
-            "Test".to_string(),
-            None,
-            &cas,
-        )
-        .unwrap();
+        let rc1 = log("info".to_string(), "Test".to_string(), None, &cas).unwrap();
+        let rc2 = log("info".to_string(), "Test".to_string(), None, &cas).unwrap();
         assert_eq!(rc1.recibo.content_cid, rc2.recibo.content_cid);
     }
 }

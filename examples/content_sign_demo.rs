@@ -1,5 +1,5 @@
 // Example: Content Sign Product
-// 
+//
 // Demonstrates how to use product.content-sign to sign content
 // and generate verifiable receipts (anti-fake news).
 
@@ -65,7 +65,7 @@ fn main() {
     println!("\n\nExample 2: Signing an image file\n");
 
     let image_content = b"[Binary image data would be here...]".to_vec();
-    
+
     let photographer_signature = Signature {
         algorithm: "ed25519".to_string(),
         public_key: "photographer_public_key".to_string(),
@@ -92,9 +92,15 @@ fn main() {
             println!("  Content CID: {}", receipt.signed_content.content_cid);
             println!("  Author: {}", receipt.signed_content.author);
             println!("  Title: {}", receipt.signed_content.title);
-            println!("  License: {}", receipt.signed_content.metadata.as_ref()
-                .and_then(|m| m.get("license"))
-                .unwrap_or(&json!("N/A")));
+            println!(
+                "  License: {}",
+                receipt
+                    .signed_content
+                    .metadata
+                    .as_ref()
+                    .and_then(|m| m.get("license"))
+                    .unwrap_or(&json!("N/A"))
+            );
 
             // Verify the signed content
             match verify_content(&receipt, image_content) {

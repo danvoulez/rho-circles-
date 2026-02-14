@@ -4,7 +4,6 @@
 /// for B2B API data exchanges. Eliminates disputes with cryptographic proof.
 ///
 /// Use case: Sidecar for APIs that need to prove "I sent this" or "I received this"
-
 use crate::chips::normalize;
 use crate::rc;
 use crate::types::{ReciboCard, Signature};
@@ -34,15 +33,12 @@ pub struct NotaryReceipt {
 ///
 /// Creates a cryptographic receipt for an API request/response pair.
 /// Both parties can sign to create proof of agreement on what was exchanged.
-pub fn notarize(
-    transaction: ApiTransaction,
-    signatures: Vec<Signature>,
-) -> Result<NotaryReceipt> {
+pub fn notarize(transaction: ApiTransaction, signatures: Vec<Signature>) -> Result<NotaryReceipt> {
     // Convert transaction to value and emit receipt card
     // Note: emit_with_signatures will normalize internally
     let transaction_value = serde_json::to_value(&transaction)?;
     let receipt_card = rc::emit_with_signatures(transaction_value, signatures)?;
-    
+
     Ok(NotaryReceipt {
         transaction,
         receipt_card,
@@ -57,7 +53,7 @@ pub fn verify(receipt: &NotaryReceipt) -> Result<bool> {
     // Re-normalize the transaction
     let transaction_value = serde_json::to_value(&receipt.transaction)?;
     let normalized = normalize(transaction_value)?;
-    
+
     // Check if CID matches
     Ok(normalized.cid == receipt.receipt_card.recibo.content_cid)
 }
@@ -80,7 +76,7 @@ mod tests {
 
         let result = notarize(transaction.clone(), vec![]);
         assert!(result.is_ok());
-        
+
         let receipt = result.unwrap();
         assert_eq!(receipt.transaction.method, "POST");
         assert!(!receipt.receipt_card.recibo.content_cid.is_empty());
@@ -111,7 +107,7 @@ mod tests {
 
         let result = notarize(transaction, vec![sig1, sig2]);
         assert!(result.is_ok());
-        
+
         let receipt = result.unwrap();
         assert_eq!(receipt.receipt_card.recibo.signatures.len(), 2);
     }
@@ -145,7 +141,7 @@ mod tests {
 
         let receipt1 = notarize(transaction.clone(), vec![]).unwrap();
         let receipt2 = notarize(transaction, vec![]).unwrap();
-        
+
         assert_eq!(
             receipt1.receipt_card.recibo.content_cid,
             receipt2.receipt_card.recibo.content_cid

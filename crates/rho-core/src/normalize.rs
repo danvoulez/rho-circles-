@@ -155,4 +155,74 @@ mod tests {
         assert_eq!(norm1, norm2);
         assert_eq!(cid1, cid2);
     }
+
+    #[cfg(test)]
+    mod proptests {
+        use super::*;
+        use proptest::prelude::*;
+
+        // Generate random JSON objects
+        fn arb_json() -> impl Strategy<Value = Value> {
+            let leaf = prop_oneof![
+                Just(Value::Null),
+                any::<bool>().prop_map(Value::Bool),
+                any::<i64>().prop_map(|n| json!(n)),
+                "\\PC*".prop_map(Value::String),
+            ];
+
+            leaf.prop_recursive(
+                3, // depth
+                64, // max nodes
+                10, // items per collection
+                |inner| {
+                    prop_oneof![
+                        prop::collection::vec(inner.clone(), 0..5)
+                            .prop_map(|v| Value::Array(v)),
+                        prop::collection::hash_map("\\w+", inner, 0..5)
+                            .prop_map(|m| {
+                                let map: serde_json::Map<String, Value> = m.into_iter().collect();
+                                Value::Object(map)
+                            }),
+                    ]
+                },
+            )
+        }
+
+        proptest! {
+            #[test]
+            fn test_normalize_idempotent_random(input in arb_json()) {
+                // Normalize once
+                if let Ok((norm1, cid1)) = normalize(input) {
+                    // Parse and normalize again
+                    let parsed: Value = serde_json::from_str(&norm1).unwrap();
+                    let (norm2, cid2) = normalize(parsed).unwrap();
+                    
+                    // Should be identical
+                    prop_assert_eq!(norm1, norm2);
+                    prop_assert_eq!(cid1, cid2);
+                }
+            }
+
+            #[test]
+            fn test_normalize_key_order_irrelevant(keys in prop::collection::vec("\\w+", 1..10)) {
+                // Create two objects with same keys in different orders
+                let mut obj1 = serde_json::Map::new();
+                let mut obj2 = serde_json::Map::new();
+                
+                for (i, key) in keys.iter().enumerate() {
+                    obj1.insert(key.clone(), json!(i));
+                }
+                
+                // Insert in reverse order
+                for (i, key) in keys.iter().enumerate().rev() {
+                    obj2.insert(key.clone(), json!(i));
+                }
+                
+                let (_, cid1) = normalize(Value::Object(obj1)).unwrap();
+                let (_, cid2) = normalize(Value::Object(obj2)).unwrap();
+                
+                prop_assert_eq!(cid1, cid2);
+            }
+        }
+    }
 }

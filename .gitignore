@@ -1,5 +1,12 @@
 /target
 
+# WASM build artifacts
+crates/*/target/
+packages/rho-wasm/rho_core.js
+packages/rho-wasm/rho_core.d.ts
+packages/rho-wasm/rho_core_bg.wasm
+packages/rho-wasm/rho_core_bg.wasm.d.ts
+
 # UI Build artifacts
 ui/node_modules/
 ui/dist/

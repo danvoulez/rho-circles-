@@ -34,7 +34,8 @@ pub fn publish(chip_spec: Value, owner_cid: Cid, cas: &Cas) -> Result<ReciboCard
 
     // Store schema in CAS
     let schema_normalized = normalize(schema)?;
-    let schema_bytes = base64::engine::general_purpose::STANDARD.decode(&schema_normalized.bytes)?;
+    let schema_bytes =
+        base64::engine::general_purpose::STANDARD.decode(&schema_normalized.bytes)?;
     let schema_cid = cas.put(schema_bytes)?;
 
     // Validate the chip spec

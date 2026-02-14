@@ -4,7 +4,6 @@
 /// Provides "blue checkmark" for content, proving it came from a legitimate source.
 ///
 /// Use case: Newsrooms, content creators, anti-fake news verification
-
 use crate::cas::Cas;
 use crate::chips::normalize;
 use crate::rc;
@@ -20,7 +19,7 @@ pub struct SignedContent {
     pub content_type: String, // "article", "image", "video", etc.
     pub title: String,
     pub author: String,
-    pub timestamp: String, // ISO 8601 format
+    pub timestamp: String,   // ISO 8601 format
     pub content_cid: String, // CID of the actual content
     #[serde(skip_serializing_if = "Option::is_none")]
     pub metadata: Option<Value>,
@@ -50,10 +49,10 @@ pub fn sign_content(
     // Hash the actual content to get its CID
     let content_hash = blake3::hash(&content);
     let content_cid = BASE64.encode(content_hash.as_bytes());
-    
+
     // Store content in CAS
     cas.put(content.clone())?;
-    
+
     // Create signed content metadata
     let signed_content = SignedContent {
         content_type,
@@ -63,11 +62,11 @@ pub fn sign_content(
         content_cid,
         metadata,
     };
-    
+
     // Emit receipt card (normalization happens inside emit_with_signatures)
     let content_value = serde_json::to_value(&signed_content)?;
     let receipt_card = rc::emit_with_signatures(content_value, signatures)?;
-    
+
     Ok(SignedReceipt {
         signed_content,
         receipt_card,
@@ -86,7 +85,7 @@ pub fn sign_json(
 ) -> Result<ReciboCard> {
     // Normalize the content first to ensure it's valid
     let normalized = normalize(content.clone())?;
-    
+
     // Create a wrapper with metadata
     let signed_doc = serde_json::json!({
         "author": author,
@@ -94,7 +93,7 @@ pub fn sign_json(
         "content_cid": normalized.cid,
         "content": content,
     });
-    
+
     // Emit receipt card (this will normalize again, but we need the CID above)
     rc::emit_with_signatures(signed_doc, signatures)
 }
@@ -107,7 +106,7 @@ pub fn verify(receipt: &SignedReceipt, content: Vec<u8>) -> Result<bool> {
     // Hash the content
     let content_hash = blake3::hash(&content);
     let content_cid = BASE64.encode(content_hash.as_bytes());
-    
+
     // Check if CID matches
     Ok(content_cid == receipt.signed_content.content_cid)
 }
@@ -115,17 +114,21 @@ pub fn verify(receipt: &SignedReceipt, content: Vec<u8>) -> Result<bool> {
 /// Verify a signed JSON document
 pub fn verify_json(receipt: &ReciboCard) -> Result<bool> {
     // Extract content from receipt
-    let content = receipt.body.get("content")
+    let content = receipt
+        .body
+        .get("content")
         .ok_or_else(|| RhoError::Validate("Missing content field".to_string()))?;
-    
+
     // Re-normalize the content
     let normalized = normalize(content.clone())?;
-    
+
     // Get the CID from receipt
-    let stored_cid = receipt.body.get("content_cid")
+    let stored_cid = receipt
+        .body
+        .get("content_cid")
         .and_then(|v| v.as_str())
         .ok_or_else(|| RhoError::Validate("Missing content_cid field".to_string()))?;
-    
+
     // Compare CIDs
     Ok(normalized.cid == stored_cid)
 }
@@ -139,13 +142,13 @@ mod tests {
     fn test_sign_content() {
         let cas = Cas::new();
         let content = b"Breaking News: Rho Circles launches three new products!";
-        
+
         let sig = Signature {
             algorithm: "ed25519".to_string(),
             public_key: "newsroom_key".to_string(),
             signature: "newsroom_sig".to_string(),
         };
-        
+
         let result = sign_content(
             "article".to_string(),
             "New Products Launch".to_string(),
@@ -156,7 +159,7 @@ mod tests {
             Some(json!({"category": "technology", "language": "en"})),
             &cas,
         );
-        
+
         assert!(result.is_ok());
         let receipt = result.unwrap();
         assert_eq!(receipt.signed_content.content_type, "article");
@@ -170,20 +173,20 @@ mod tests {
             "headline": "Important Announcement",
             "body": "This is verified content"
         });
-        
+
         let sig = Signature {
             algorithm: "ed25519".to_string(),
             public_key: "publisher_key".to_string(),
             signature: "publisher_sig".to_string(),
         };
-        
+
         let result = sign_json(
             content,
             "Publisher Inc".to_string(),
             "2024-01-01T12:00:00Z".to_string(),
             vec![sig],
         );
-        
+
         assert!(result.is_ok());
         let receipt = result.unwrap();
         assert_eq!(receipt.body["author"], "Publisher Inc");
@@ -194,7 +197,7 @@ mod tests {
     fn test_verify_content() {
         let cas = Cas::new();
         let content = b"Test content for verification";
-        
+
         let receipt = sign_content(
             "document".to_string(),
             "Test Doc".to_string(),
@@ -204,11 +207,12 @@ mod tests {
             vec![],
             None,
             &cas,
-        ).unwrap();
-        
+        )
+        .unwrap();
+
         let is_valid = verify(&receipt, content.to_vec()).unwrap();
         assert!(is_valid);
-        
+
         // Test with tampered content
         let tampered = b"Tampered content";
         let is_valid_tampered = verify(&receipt, tampered.to_vec()).unwrap();
@@ -223,8 +227,9 @@ mod tests {
             "Author".to_string(),
             "2024-01-01T12:00:00Z".to_string(),
             vec![],
-        ).unwrap();
-        
+        )
+        .unwrap();
+
         let is_valid = verify_json(&receipt).unwrap();
         assert!(is_valid);
     }
@@ -233,7 +238,7 @@ mod tests {
     fn test_sign_content_deterministic() {
         let cas = Cas::new();
         let content = b"Deterministic test content";
-        
+
         let receipt1 = sign_content(
             "test".to_string(),
             "Title".to_string(),
@@ -243,8 +248,9 @@ mod tests {
             vec![],
             None,
             &cas,
-        ).unwrap();
-        
+        )
+        .unwrap();
+
         let receipt2 = sign_content(
             "test".to_string(),
             "Title".to_string(),
@@ -254,8 +260,9 @@ mod tests {
             vec![],
             None,
             &cas,
-        ).unwrap();
-        
+        )
+        .unwrap();
+
         assert_eq!(
             receipt1.receipt_card.recibo.content_cid,
             receipt2.receipt_card.recibo.content_cid
