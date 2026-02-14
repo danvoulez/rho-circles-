@@ -38,13 +38,9 @@ pub fn notarize(
     transaction: ApiTransaction,
     signatures: Vec<Signature>,
 ) -> Result<NotaryReceipt> {
-    // Normalize the transaction to get canonical form
+    // Convert transaction to value and emit receipt card
+    // Note: emit_with_signatures will normalize internally
     let transaction_value = serde_json::to_value(&transaction)?;
-    
-    // Verify the transaction can be normalized (deterministic check)
-    normalize(transaction_value.clone())?;
-    
-    // Emit receipt card with signatures
     let receipt_card = rc::emit_with_signatures(transaction_value, signatures)?;
     
     Ok(NotaryReceipt {

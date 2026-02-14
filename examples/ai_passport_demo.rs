@@ -49,6 +49,9 @@ fn main() {
     match register_model(
         model_info.clone(),
         model_weights,
+        "EU AI Act".to_string(),
+        "limited".to_string(),
+        "Independent Auditor".to_string(),
         compliance_pdf,
         bias_metrics.clone(),
         "2024-01-15T09:00:00Z".to_string(),
@@ -116,7 +119,7 @@ fn main() {
 
     let compliance_2 = ComplianceDoc {
         framework: "EU AI Act".to_string(),
-        risk_level: "high".to_string(), // Content moderation is high-risk
+        risk_level: "high".to_string(), // Content moderation is high-risk per EU AI Act Annex III
         certification_date: "2024-01-10T00:00:00Z".to_string(),
         auditor: "AI Safety Institute Europe".to_string(),
         document_cid: "Q2FzaGVkX19jb21wbGlhbmNlX2RvY19oYXNo".to_string(), // Pre-computed

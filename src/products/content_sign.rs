@@ -64,10 +64,8 @@ pub fn sign_content(
         metadata,
     };
     
-    // Normalize and emit receipt
+    // Emit receipt card (normalization happens inside emit_with_signatures)
     let content_value = serde_json::to_value(&signed_content)?;
-    normalize(content_value.clone())?; // Verify it's normalizable
-    
     let receipt_card = rc::emit_with_signatures(content_value, signatures)?;
     
     Ok(SignedReceipt {
@@ -97,7 +95,7 @@ pub fn sign_json(
         "content": content,
     });
     
-    // Emit receipt card
+    // Emit receipt card (this will normalize again, but we need the CID above)
     rc::emit_with_signatures(signed_doc, signatures)
 }
 

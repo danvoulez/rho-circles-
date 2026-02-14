@@ -72,6 +72,9 @@ pub struct PassportReceipt {
 pub fn register_model(
     model_info: ModelInfo,
     model_weights: Vec<u8>,
+    compliance_framework: String,
+    compliance_risk_level: String,
+    compliance_auditor: String,
     compliance_pdf: Vec<u8>,
     bias_metrics: BiasMetrics,
     registration_timestamp: String,
@@ -89,12 +92,12 @@ pub fn register_model(
     let document_cid = BASE64.encode(pdf_hash.as_bytes());
     cas.put(compliance_pdf.clone())?;
     
-    // Create compliance doc with PDF CID
+    // Create compliance doc with provided parameters
     let compliance = ComplianceDoc {
-        framework: "EU AI Act".to_string(),
-        risk_level: "limited".to_string(),
+        framework: compliance_framework,
+        risk_level: compliance_risk_level,
         certification_date: registration_timestamp.clone(),
-        auditor: "Independent Auditor".to_string(),
+        auditor: compliance_auditor,
         document_cid,
     };
     
@@ -108,10 +111,8 @@ pub fn register_model(
         additional_metadata,
     };
     
-    // Normalize and emit receipt
+    // Emit receipt card (normalization happens inside emit_with_signatures)
     let passport_value = serde_json::to_value(&passport)?;
-    normalize(passport_value.clone())?; // Verify it's normalizable
-    
     let receipt_card = rc::emit_with_signatures(passport_value, signatures)?;
     
     Ok(PassportReceipt {
@@ -141,9 +142,8 @@ pub fn register_with_hash(
         additional_metadata: None,
     };
     
+    // Emit receipt card (normalization happens inside emit_with_signatures)
     let passport_value = serde_json::to_value(&passport)?;
-    normalize(passport_value.clone())?;
-    
     let receipt_card = rc::emit_with_signatures(passport_value, signatures)?;
     
     Ok(PassportReceipt {
@@ -232,6 +232,9 @@ mod tests {
         let result = register_model(
             model_info,
             model_weights,
+            "EU AI Act".to_string(),
+            "limited".to_string(),
+            "Independent Auditor".to_string(),
             compliance_pdf,
             bias_metrics,
             "2024-01-01T12:00:00Z".to_string(),
