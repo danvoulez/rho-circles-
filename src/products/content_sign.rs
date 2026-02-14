@@ -36,6 +36,7 @@ pub struct SignedReceipt {
 ///
 /// Creates a Recibo Card that proves the content came from a specific author/organization.
 /// The receipt can be verified offline by checking signatures and CID.
+#[allow(clippy::too_many_arguments)]
 pub fn sign_content(
     content_type: String,
     title: String,

@@ -1,6 +1,47 @@
 # Chip Registry
 
+![CI](https://github.com/danvoulez/rho-circles-/actions/workflows/ci.yml/badge.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
+![WASM](https://img.shields.io/badge/target-wasm32--unknown--unknown-informational)
+
 This repository implements the Rho Circles Chip Registry system, a deterministic computation platform based on content-addressable storage and cryptographic verification.
+
+## Try it
+
+### Browser (WASM)
+
+The core normalization and CID functionality is available as a WebAssembly module for use in browsers and Node.js.
+
+```bash
+# Install prerequisites (one-time)
+rustup target add wasm32-unknown-unknown
+cargo install wasm-bindgen-cli --version 0.2.108
+
+# Build WASM module
+./build-wasm.sh
+```
+
+```typescript
+import { init, normalize, validate, cid } from "packages/rho-wasm";
+
+// Initialize the WASM module
+await init("/rho_core_bg.wasm");
+
+// Normalize JSON (removes null, sorts keys, applies Unicode NFC)
+const out = normalize({ a: 1, b: null });
+console.log(out.normalized); // { "a": 1 }
+console.log(out.cid);        // CID in base64url format (no padding)
+
+// The normalization is idempotent and deterministic
+const out2 = normalize(JSON.parse(out.normalized));
+console.log(out.cid === out2.cid); // Always true
+```
+
+**Key Features:**
+- **Deterministic normalization**: Same input always produces same output
+- **CID stability**: Content IDs use blake3 + base64url (no padding)
+- **Unicode NFC**: Ensures text normalization across platforms
+- **Path-aware validation**: Returns JSON paths for errors (e.g., `$.a[2].b`)
 
 ## Architecture
 
@@ -232,3 +273,7 @@ The UI uses the real `rho-core` WASM module for:
 2. **RB→RC**: exec(rb_cid, inputs) twice → same content_cid
 3. **Byte Law**: change recibo → same content_cid
 4. **No-IO**: panic if std::time or std::net used (except gateways)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
