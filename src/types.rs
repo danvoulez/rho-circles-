@@ -74,3 +74,26 @@ pub struct Proof {
     pub signature: String,
     pub message_cid: Cid,
 }
+
+/// Recibo Card - Signed computation record
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ReciboCard {
+    pub body: serde_json::Value,
+    pub recibo: Recibo,
+}
+
+/// Recibo metadata
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Recibo {
+    pub content_cid: Cid,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub signatures: Vec<Signature>,
+}
+
+/// Signature
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Signature {
+    pub algorithm: String,
+    pub public_key: String,
+    pub signature: String,
+}

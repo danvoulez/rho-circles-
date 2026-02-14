@@ -7,3 +7,4 @@ pub mod rc;
 pub mod types;
 
 pub use errors::{Result, RhoError};
+pub use types::{Recibo, ReciboCard, Signature};

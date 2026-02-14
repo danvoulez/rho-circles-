@@ -104,7 +104,7 @@
       "outputs": {
         "rc": { "type": "object" }
       },
-      "status": "not_implemented"
+      "status": "implemented"
     },
     "mod.chip.publish": {
       "chip": "mod.chip.publish",
@@ -117,7 +117,7 @@
       "outputs": { 
         "rc": { "type": "object" } 
       },
-      "status": "not_implemented"
+      "status": "implemented"
     },
     "mod.chip.build": {
       "chip": "mod.chip.build",
@@ -129,7 +129,7 @@
       "outputs": { 
         "rc": { "type": "object" } 
       },
-      "status": "not_implemented"
+      "status": "implemented"
     },
     "mod.chip.eval": {
       "chip": "mod.chip.eval",
@@ -142,7 +142,7 @@
       "outputs": { 
         "rc": { "type": "object" } 
       },
-      "status": "not_implemented"
+      "status": "implemented"
     },
     "mod.ledger.append": {
       "chip": "mod.ledger.append",
@@ -154,7 +154,7 @@
       "outputs": { 
         "success": { "type": "boolean" } 
       },
-      "status": "not_implemented"
+      "status": "implemented"
     },
     "mod.permit": {
       "chip": "mod.permit",
@@ -169,7 +169,7 @@
       "outputs": { 
         "allowed": { "type": "boolean" } 
       },
-      "status": "not_implemented"
+      "status": "implemented"
     },
     "mod.judge": {
       "chip": "mod.judge",
@@ -182,7 +182,7 @@
       "outputs": { 
         "rc": { "type": "object" } 
       },
-      "status": "not_implemented"
+      "status": "implemented"
     }
   },
   "products": {
