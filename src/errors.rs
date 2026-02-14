@@ -26,8 +26,20 @@ pub enum RhoError {
     #[error("IO error: {0}")]
     Io(#[from] std::io::Error),
 
+    #[error("Base64 decode error: {0}")]
+    Base64(#[from] base64::DecodeError),
+
     #[error("Invalid input: {0}")]
     InvalidInput(String),
+
+    #[error("Validation failed: {0}")]
+    ValidationFailed(String),
+
+    #[error("CID not found: {0}")]
+    CidNotFound(String),
+
+    #[error("CID mismatch: expected {expected}, got {actual}")]
+    CidMismatch { expected: String, actual: String },
 }
 
 pub type Result<T> = std::result::Result<T, RhoError>;
