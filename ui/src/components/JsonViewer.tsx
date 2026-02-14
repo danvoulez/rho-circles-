@@ -12,13 +12,9 @@ export function JsonViewer({ data, mode = 'human', maxHeight = '400px' }: JsonVi
     ? JSON.stringify(data, Object.keys(data).sort())
     : JSON.stringify(data, null, 2);
 
-  // Simple syntax highlighting
-  const highlighted = jsonString
-    .replace(/"([^"]+)":/g, '<span class="text-blue-400">"$1"</span>:')
-    .replace(/: "([^"]+)"/g, ': <span class="text-green-400">"$1"</span>')
-    .replace(/: (\d+)/g, ': <span class="text-purple-400">$1</span>')
-    .replace(/: (true|false)/g, ': <span class="text-yellow-400">$1</span>')
-    .replace(/: null/g, ': <span class="text-red-400">null</span>');
+  // Safe syntax highlighting without dangerouslySetInnerHTML
+  // Split by lines and apply styling per line
+  const lines = jsonString.split('\n');
 
   return (
     <div 
@@ -26,7 +22,34 @@ export function JsonViewer({ data, mode = 'human', maxHeight = '400px' }: JsonVi
       style={{ maxHeight }}
     >
       <pre className="font-mono text-sm text-slate-200">
-        <code dangerouslySetInnerHTML={{ __html: highlighted }} />
+        {lines.map((line, idx) => {
+          // Simple safe coloring based on content patterns
+          if (line.includes('"') && line.includes(':')) {
+            // Property name
+            const parts = line.split(':');
+            return (
+              <div key={idx}>
+                <span className="text-blue-400">{parts[0]}</span>
+                {parts.length > 1 && (
+                  <>
+                    <span>:</span>
+                    <span className={
+                      parts[1].includes('true') || parts[1].includes('false') 
+                        ? 'text-yellow-400'
+                        : parts[1].includes('null')
+                        ? 'text-red-400'
+                        : /\d+/.test(parts[1])
+                        ? 'text-purple-400'
+                        : 'text-green-400'
+                    }>{parts.slice(1).join(':')}</span>
+                  </>
+                )}
+              </div>
+            );
+          }
+          
+          return <div key={idx}>{line || ' '}</div>;
+        })}
       </pre>
     </div>
   );
